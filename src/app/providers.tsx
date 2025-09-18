@@ -52,6 +52,8 @@ type ConversationContextValue = {
   scriptSuggestions: ScriptSuggestion[];
   transcribeAudio: (file: File) => Promise<void>;
   requestScriptSuggestions: (latestUtterance: string) => Promise<void>;
+  addCustomerUtterance: (text: string) => Promise<void>;
+  acceptSuggestion: (suggestion: ScriptSuggestion) => Promise<void>;
 };
 
 const ConversationContext = createContext<ConversationContextValue | null>(null);
@@ -261,7 +263,7 @@ function ConversationProvider({ children }: PropsWithChildren) {
         setIsTranscribing(false);
       }
     },
-    [appendBlock]
+    [appendBlock, setScriptSuggestions]
   );
 
   const requestScriptSuggestions = useCallback(
@@ -311,6 +313,44 @@ function ConversationProvider({ children }: PropsWithChildren) {
     [conversation.id]
   );
 
+  const addCustomerUtterance = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return;
+      }
+
+      const now = new Date();
+      appendBlock({
+        id: `customer-${crypto.randomUUID()}`,
+        speaker: "customer",
+        text: trimmed,
+        timestamp: now.toISOString(),
+        emotion: "neutral",
+      });
+
+      await requestScriptSuggestions(trimmed);
+    },
+    [appendBlock, requestScriptSuggestions]
+  );
+
+  const acceptSuggestion = useCallback(
+    async (suggestion: ScriptSuggestion) => {
+      const now = new Date();
+      appendBlock({
+        id: `agent-${crypto.randomUUID()}`,
+        speaker: "agent",
+        text: suggestion.body,
+        timestamp: now.toISOString(),
+        suggestedResponse: suggestion.title,
+        emotion: "positive",
+      });
+
+      setScriptSuggestions([]);
+    },
+    [appendBlock, setScriptSuggestions]
+  );
+
   const value = useMemo(
     () => ({
       conversation,
@@ -319,6 +359,8 @@ function ConversationProvider({ children }: PropsWithChildren) {
       scriptSuggestions,
       transcribeAudio,
       requestScriptSuggestions,
+      addCustomerUtterance,
+      acceptSuggestion,
     }),
     [
       conversation,
@@ -327,6 +369,8 @@ function ConversationProvider({ children }: PropsWithChildren) {
       scriptSuggestions,
       transcribeAudio,
       requestScriptSuggestions,
+      addCustomerUtterance,
+      acceptSuggestion,
     ]
   );
 

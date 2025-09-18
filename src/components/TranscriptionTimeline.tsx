@@ -68,6 +68,4 @@ export default function TranscriptionTimeline() {
       )}
     </div>
   );
-
-
 }

@@ -1,4 +1,4 @@
-import AudioUpload from "@/components/AudioUpload";
+import ManualConversationInput from "@/components/ManualConversationInput";
 import AnalyticsSummary from "@/components/AnalyticsSummary";
 import LearningDataManager from "@/components/LearningDataManager";
 import ScriptSuggestionPanel from "@/components/ScriptSuggestionPanel";
@@ -13,13 +13,13 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-neutral-foreground">会話ログ</h2>
-              <p className="text-base text-neutral-muted">リアルタイムで記録された通話内容を振り返ります。</p>
+              <p className="text-base text-neutral-muted">通話内容を手入力しながら推奨トークを検証できます。</p>
             </div>
             <span className="text-base uppercase tracking-[0.3em] text-neutral-muted">
-              Upload &amp; Transcript
+              Manual Entry
             </span>
           </div>
-          <AudioUpload />
+          <ManualConversationInput />
           <TranscriptionTimeline />
         </div>
       </section>
@@ -29,13 +29,13 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-neutral-foreground">トークフロー</h2>
-              <p className="text-base text-neutral-muted">発話の分岐と推奨トークの流れを俯瞰します。</p>
+              <p className="text-base text-neutral-muted">選択したトークとLLMが提案する次の一手を矢印で確認できます。</p>
             </div>
             <div className="flex items-center gap-3 text-base text-neutral-muted">
               <span className="rounded-full border border-neutral-border px-3 py-1 font-semibold text-neutral-foreground">
                 アポ成約率 平均 42%
               </span>
-              <span className="rounded-full border border-neutral-border px-3 py-1">ホバーで次の語を確認</span>
+              <span className="rounded-full border border-neutral-border px-3 py-1">候補矢印は提案中の案です</span>
             </div>
           </div>
           <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-neutral-border bg-surface-muted/20 p-2">
