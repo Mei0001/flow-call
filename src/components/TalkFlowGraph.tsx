@@ -6,6 +6,7 @@ import ReactFlow, {
   Controls,
   MarkerType,
   MiniMap,
+  Position,
   type Edge,
   type Node,
 } from "reactflow";
@@ -15,6 +16,10 @@ import { useConversation } from "@/app/providers";
 
 const nodeWidth = 240;
 const nodeHeight = 120;
+const horizontalSpacing = 140;
+const verticalSpacing = 80;
+const suggestionOffsetX = 160;
+const suggestionSpacingY = 40;
 
 export default function TalkFlowGraph() {
   const { conversation, scriptSuggestions } = useConversation();
@@ -24,13 +29,14 @@ export default function TalkFlowGraph() {
     const generatedEdges: Edge[] = [];
 
     conversation.blocks.forEach((block, index) => {
-      const yOffset = index * (nodeHeight + 40);
       const isAgent = block.speaker === "agent";
+      const xOffset = index * (nodeWidth + horizontalSpacing);
+      const yOffset = isAgent ? 0 : nodeHeight + verticalSpacing;
 
       generatedNodes.push({
         id: block.id,
         position: {
-          x: isAgent ? nodeWidth + 120 : 0,
+          x: xOffset,
           y: yOffset,
         },
         data: {
@@ -47,6 +53,8 @@ export default function TalkFlowGraph() {
           fontSize: "16px",
           lineHeight: 1.5,
         },
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
       });
 
       const previousBlock = conversation.blocks[index - 1];
@@ -62,10 +70,13 @@ export default function TalkFlowGraph() {
             height: 22,
             color: "#000000",
           },
-          animated: isAgent,
+          animated: true,
           style: {
             strokeWidth: 2,
             stroke: "rgba(0,0,0,0.45)",
+          },
+          pathOptions: {
+            borderRadius: 12,
           },
         });
       }
@@ -78,15 +89,17 @@ export default function TalkFlowGraph() {
     if (scriptSuggestions.length && latestCustomerIndex !== -1) {
       const anchorIndex = conversation.blocks.length - 1 - latestCustomerIndex;
       const anchorBlock = conversation.blocks[anchorIndex];
-      const baseY = anchorIndex * (nodeHeight + 40);
+      const baseX = (anchorIndex + 1) * (nodeWidth + horizontalSpacing) + suggestionOffsetX;
+      const anchorIsAgent = anchorBlock.speaker === "agent";
+      const anchorY = anchorIsAgent ? 0 : nodeHeight + verticalSpacing;
 
       scriptSuggestions.forEach((suggestion, suggestionIndex) => {
         const suggestionId = `suggestion-${suggestion.id}`;
         generatedNodes.push({
           id: suggestionId,
           position: {
-            x: nodeWidth * 2 + 200,
-            y: baseY + suggestionIndex * (nodeHeight + 24),
+            x: baseX,
+            y: anchorY + suggestionIndex * (nodeHeight + suggestionSpacingY),
           },
           data: {
             label: suggestion.body,
@@ -102,6 +115,8 @@ export default function TalkFlowGraph() {
             fontSize: "16px",
             lineHeight: 1.5,
           },
+          targetPosition: Position.Left,
+          sourcePosition: Position.Right,
         });
 
         generatedEdges.push({
@@ -121,6 +136,9 @@ export default function TalkFlowGraph() {
             stroke: "rgba(0,0,0,0.35)",
             strokeDasharray: "6 6",
           },
+          pathOptions: {
+            borderRadius: 12,
+          },
         });
       });
     }
@@ -128,7 +146,7 @@ export default function TalkFlowGraph() {
     if (!conversation.blocks.length) {
       generatedNodes.push({
         id: "empty",
-        position: { x: 60, y: 120 },
+        position: { x: 60, y: nodeHeight / 2 },
         data: {
           label: "最初の顧客発話を追加するとフローが生成されます",
           speaker: "System",
@@ -143,6 +161,8 @@ export default function TalkFlowGraph() {
           fontSize: "16px",
           lineHeight: 1.5,
         },
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
       });
     }
 
