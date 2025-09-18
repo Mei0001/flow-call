@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* Tailwind v4 theme tokens are declared via @theme so utility classes exist. */
+@theme {
+  --font-sans: var(--font-geist-sans), Inter, "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), Menlo, monospace;
+
+  --color-canvas: #0f1d35;
+  --color-surface: #182a4e;
+  --color-surface-muted: #1f3561;
+  --color-surface-overlay: rgba(24, 42, 78, 0.75);
+  --color-brand: #3b82f6;
+  --color-brand-subtle: rgba(59, 130, 246, 0.2);
+  --color-brand-strong: #2563eb;
+  --color-brand-foreground: #f8fafc;
+  --color-accent: #38c0ff;
+  --color-accent-foreground: #06263b;
+  --color-neutral: #a5b4ca;
+  --color-neutral-foreground: #f0f4ff;
+  --color-neutral-muted: #7b8dab;
+  --color-neutral-border: rgba(165, 180, 202, 0.18);
+  --color-success: #34d399;
+  --color-success-foreground: #073226;
+  --color-warning: #fbbf24;
+  --color-warning-foreground: #4a2806;
+  --color-danger: #fca5a5;
+  --color-danger-foreground: #4f0d0d;
+
+  --shadow-panel: 0 20px 45px -25px rgba(15, 23, 42, 0.45);
+  --shadow-card: 0 10px 30px -15px rgba(15, 23, 42, 0.35);
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --spacing-gutter: 1.5rem;
+  --container-container: 1180px;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --color-canvas: #eef3ff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e2e8ff;
+  --color-surface-overlay: rgba(51, 102, 204, 0.12);
+  --color-brand: #2563eb;
+  --color-brand-subtle: rgba(37, 99, 235, 0.1);
+  --color-brand-strong: #1d4ed8;
+  --color-brand-foreground: #f8fafc;
+  --color-accent: #0ea5e9;
+  --color-accent-foreground: #013047;
+  --color-neutral: #54627a;
+  --color-neutral-foreground: #0f172a;
+  --color-neutral-muted: #a3b1c9;
+  --color-neutral-border: rgba(37, 56, 94, 0.14);
+  --color-success: #16a34a;
+  --color-success-foreground: #064420;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #512a05;
+  --color-danger: #f87171;
+  --color-danger-foreground: #5c1a1a;
+}
+
+@layer base {
+  *, *::before, *::after {
+    border-color: var(--color-neutral-border);
+  }
+
+  body {
+    @apply bg-canvas text-neutral-foreground antialiased;
+    font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", sans-serif;
+    min-height: 100vh;
+  }
+
+  main {
+    @apply mx-auto w-full max-w-container px-gutter py-8;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-neutral-foreground tracking-tight;
+  }
+
+  p {
+    @apply text-neutral;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-brand-foreground);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply rounded-2xl bg-surface-overlay shadow-panel backdrop-blur;
+  }
+
+  .section-title {
+    @apply text-sm uppercase tracking-[0.3em] text-neutral-muted;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--color-neutral-muted);
+    border-radius: 999px;
+  }
+}
