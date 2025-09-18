@@ -21,6 +21,8 @@ export interface TalkBlock {
   suggestedResponse?: string;
   responseTime?: number;
   emotion?: Emotion;
+  nextTokens?: string[];
+  appointmentProbability?: number;
 }
 
 export interface Conversation {
@@ -85,6 +87,8 @@ const baseConversation: Conversation = {
       text: "こんにちは。どちら様でしょうか？",
       timestamp: "2024-09-17T01:30:05.000Z",
       emotion: "neutral",
+      nextTokens: ["お名前は？", "ご用件は？"],
+      appointmentProbability: 0.18,
     },
     {
       id: "block-2",
@@ -95,6 +99,8 @@ const baseConversation: Conversation = {
       suggestedResponse:
         "本日はアウトバウンド対応におけるトーク支援システムのご紹介でお電話しました。",
       emotion: "positive",
+      nextTokens: ["ご担当者様はいらっしゃいますか？", "30秒だけお時間いただけますか？"],
+      appointmentProbability: 0.42,
     },
     {
       id: "block-3",
@@ -102,6 +108,8 @@ const baseConversation: Conversation = {
       text: "今は少し忙しいのですが、短く教えてください。",
       timestamp: "2024-09-17T01:30:20.000Z",
       emotion: "neutral",
+      nextTokens: ["要点をお願いします", "結論から言ってください"],
+      appointmentProbability: 0.27,
     },
   ],
   outcome: "pending",

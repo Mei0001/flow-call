@@ -74,13 +74,13 @@ export default function AnalyticsSummary() {
           key={card.label}
           className="rounded-2xl border border-neutral-border bg-surface-muted/70 px-4 py-3"
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-neutral-muted">
+          <p className="text-base uppercase tracking-[0.3em] text-neutral-muted">
             {card.label}
           </p>
           <p className="mt-2 text-2xl font-semibold text-neutral-foreground">
             {card.value}
           </p>
-          <p className="mt-1 text-xs text-neutral-muted">{card.caption}</p>
+          <p className="mt-1 text-base text-neutral-muted">{card.caption}</p>
         </div>
       ))}
     </div>

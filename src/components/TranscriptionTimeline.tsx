@@ -26,38 +26,48 @@ export default function TranscriptionTimeline() {
   );
 
   return (
-    <div className="flex max-h-[360px] flex-col gap-4 overflow-y-auto rounded-2xl border border-neutral-border bg-surface px-4 py-4 scrollbar-thin">
-      {orderedBlocks.map((block) => (
-        <article
-          key={block.id}
-          className={`flex flex-col gap-2 rounded-xl px-4 py-3 shadow-sm transition ${
-            block.speaker === "agent"
-              ? "bg-brand-subtle/70 text-brand-foreground"
-              : "bg-surface-muted text-neutral-foreground"
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs text-neutral-muted">
-            <span className="font-semibold uppercase tracking-[0.3em]">
-              {block.speaker === "agent" ? "Agent" : "Customer"}
-            </span>
-            <span>{formatTimestamp(block.timestamp)}</span>
-          </div>
-          <p className="text-sm leading-relaxed text-neutral-foreground">
-            {block.text}
-          </p>
-          {block.suggestedResponse && (
-            <div className="rounded-lg bg-brand-subtle/60 px-3 py-2 text-xs text-brand-foreground">
-              推奨応答: {block.suggestedResponse}
+    <div className="flex max-h-[420px] flex-col gap-4 overflow-y-auto rounded-2xl border border-neutral-border bg-white/80 p-5 scrollbar-thin">
+      {orderedBlocks.map((block) => {
+        const isAgent = block.speaker === "agent";
+
+        return (
+          <article
+            key={block.id}
+            className="group relative flex gap-4 rounded-2xl border border-neutral-border bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="relative flex flex-col items-center">
+              <span
+                className={`mt-1 inline-flex h-3 w-3 rounded-full border border-neutral-border ${
+                  isAgent ? "bg-black" : "bg-white"
+                }`}
+              />
+              <span className="mt-3 h-full w-px bg-neutral-border" aria-hidden />
             </div>
-          )}
-        </article>
-      ))}
+            <div className="flex flex-1 flex-col gap-3 text-neutral-foreground">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-base text-neutral-muted">
+                <span className="font-semibold uppercase tracking-[0.3em]">
+                  {isAgent ? "Agent" : "Customer"}
+                </span>
+                <span>{formatTimestamp(block.timestamp)}</span>
+              </div>
+              <p className="text-base leading-relaxed text-neutral-foreground">{block.text}</p>
+              {block.suggestedResponse && (
+                <div className="rounded-xl border border-neutral-border bg-black/5 px-4 py-2 text-base text-neutral-foreground">
+                  推奨応答: {block.suggestedResponse}
+                </div>
+              )}
+            </div>
+          </article>
+        );
+      })}
 
       {isTranscribing && (
-        <div className="rounded-xl border border-brand/40 bg-brand-subtle/40 px-3 py-2 text-xs text-brand-foreground">
+        <div className="rounded-2xl border border-dashed border-neutral-border bg-black/5 px-4 py-3 text-base text-neutral-foreground">
           文字起こしを実行中です...
         </div>
       )}
     </div>
   );
+
+
 }
