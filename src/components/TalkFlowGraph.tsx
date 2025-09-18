@@ -155,7 +155,6 @@ export default function TalkFlowGraph() {
         fitView
         nodes={nodes}
         edges={edges}
-        proOptions={{ hideFitView: true }}
         panOnScroll
         panOnDrag
         zoomOnScroll
