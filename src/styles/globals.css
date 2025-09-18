@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* Tailwind v4 theme tokens are declared via @theme so utility classes exist. */
+@theme {
+  --font-sans: var(--font-geist-sans), Inter, "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), Menlo, monospace;
+
+  --color-canvas: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #ffffff;
+  --color-surface-overlay: rgba(255, 255, 255, 0.9);
+  --color-brand: #000000;
+  --color-brand-subtle: rgba(0, 0, 0, 0.05);
+  --color-brand-strong: #000000;
+  --color-brand-foreground: #ffffff;
+  --color-accent: #000000;
+  --color-accent-foreground: #ffffff;
+  --color-neutral: #000000;
+  --color-neutral-foreground: #000000;
+  --color-neutral-muted: #000000;
+  --color-neutral-border: rgba(0, 0, 0, 0.12);
+  --color-success: #000000;
+  --color-success-foreground: #ffffff;
+  --color-warning: #000000;
+  --color-warning-foreground: #ffffff;
+  --color-danger: #000000;
+  --color-danger-foreground: #ffffff;
+
+  --shadow-panel: 0 20px 45px -25px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 10px 30px -15px rgba(0, 0, 0, 0.1);
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --spacing-gutter: 1.5rem;
+  --container-container: 1180px;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+@layer base {
+  *, *::before, *::after {
+    border-color: var(--color-neutral-border);
+  }
+
+  body {
+    @apply bg-canvas text-neutral-foreground antialiased;
+    font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", sans-serif;
+    min-height: 100vh;
+  }
+
+  main {
+    @apply w-full px-gutter py-8 xl:px-20;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-neutral-foreground tracking-tight;
+  }
+
+  p {
+    @apply text-neutral;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-brand-foreground);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply rounded-2xl bg-surface-overlay shadow-panel backdrop-blur;
+  }
+
+  .section-title {
+    @apply text-base uppercase tracking-[0.3em] text-neutral-muted;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--color-neutral-muted);
+    border-radius: 999px;
+  }
+}
