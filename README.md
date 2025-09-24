@@ -29,8 +29,15 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Cloudflare Pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is configured for Cloudflare Pages using [`@cloudflare/next-on-pages`](https://github.com/cloudflare/next-on-pages).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Ensure your API routes that run server-side code opt into the Edge runtime. (Example: `src/app/api/generate-script/route.ts` now exports `runtime = "edge"`.)
+2. Build locally with `npm run cf:build`. _Note_: Running this command outside Cloudflare's CI requires a `.vercel/project.json` (created via `vercel link`/`vercel pull`) or exported `VERCEL_ORG_ID`/`VERCEL_PROJECT_ID` values so that `vercel build` can determine project settings. Cloudflare's build environment supplies these automatically.
+3. Preview locally with `npm run cf:preview` once the build output exists.
+4. Deploy via:
+   - **Git integration**: Set _Framework preset_ to **Next.js**, _Build command_ to `npx @cloudflare/next-on-pages@1`, and _Build output directory_ to `.vercel/output/static`. Add the `nodejs_compat` compatibility flag for production and preview under _Settings → Functions_. Provide required environment variables (for example `OPENAI_API_KEY`) under _Settings → Environment variables_.
+   - **Direct upload**: Set `CLOUDFLARE_PAGES_PROJECT=<project-name>` and run `npm run cf:deploy`.
+
+If you prefer Vercel, follow the standard [Next.js deployment guide](https://nextjs.org/docs/app/building-your-application/deploying).

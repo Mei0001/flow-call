@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cf:build": "npx --yes @cloudflare/next-on-pages@1",
+    "cf:preview": "npm run cf:build && npx --yes wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat",
+    "cf:deploy": "npm run cf:build && npx --yes wrangler pages deploy .vercel/output/static --project-name $CLOUDFLARE_PAGES_PROJECT"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
