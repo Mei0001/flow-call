@@ -278,6 +278,12 @@ function ConversationProvider({ children }: PropsWithChildren) {
           body: JSON.stringify({
             utterance: latestUtterance,
             conversationId: conversation.id,
+            conversation: {
+              id: conversation.id,
+              blocks: conversation.blocks,
+              outcome: conversation.outcome,
+              metadata: conversation.metadata,
+            },
           }),
         });
 

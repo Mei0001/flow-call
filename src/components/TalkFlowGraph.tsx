@@ -1,18 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
   MarkerType,
   MiniMap,
   Position,
+  ReactFlowProvider,
+  useReactFlow,
   type Edge,
   type Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import { useConversation } from "@/app/providers";
+import { ScriptSuggestion, useConversation } from "@/app/providers";
 
 const nodeWidth = 240;
 const nodeHeight = 120;
@@ -20,12 +22,26 @@ const horizontalSpacing = 140;
 const verticalSpacing = 80;
 const suggestionOffsetX = 160;
 const suggestionSpacingY = 40;
+const preferredZoom = 1.05;
 
-export default function TalkFlowGraph() {
-  const { conversation, scriptSuggestions } = useConversation();
+type ConversationNodeData = {
+  label: string;
+  speaker: string;
+  type: "conversation" | "suggestion" | "system";
+  suggestion?: ScriptSuggestion;
+};
+
+type ConversationNode = Node<ConversationNodeData>;
+
+function TalkFlowGraphInner() {
+  const { conversation, scriptSuggestions, acceptSuggestion } = useConversation();
+  const [pendingSuggestionId, setPendingSuggestionId] = useState<string | null>(null);
+  const { fitView, setCenter, zoomTo } = useReactFlow();
+  const isInitializedRef = useRef(false);
+  const previousBlockCountRef = useRef(conversation.blocks.length);
 
   const { nodes, edges } = useMemo(() => {
-    const generatedNodes: Node[] = [];
+    const generatedNodes: ConversationNode[] = [];
     const generatedEdges: Edge[] = [];
 
     conversation.blocks.forEach((block, index) => {
@@ -42,6 +58,7 @@ export default function TalkFlowGraph() {
         data: {
           label: block.text,
           speaker: isAgent ? "Agent" : "Customer",
+          type: "conversation",
         },
         style: {
           width: nodeWidth,
@@ -95,6 +112,8 @@ export default function TalkFlowGraph() {
 
       scriptSuggestions.forEach((suggestion, suggestionIndex) => {
         const suggestionId = `suggestion-${suggestion.id}`;
+        const isDisabled = Boolean(pendingSuggestionId && pendingSuggestionId !== suggestionId);
+
         generatedNodes.push({
           id: suggestionId,
           position: {
@@ -104,6 +123,8 @@ export default function TalkFlowGraph() {
           data: {
             label: suggestion.body,
             speaker: "候補",
+            type: "suggestion",
+            suggestion,
           },
           style: {
             width: nodeWidth,
@@ -114,6 +135,8 @@ export default function TalkFlowGraph() {
             color: "#000000",
             fontSize: "16px",
             lineHeight: 1.5,
+            cursor: isDisabled ? "not-allowed" : "pointer",
+            opacity: isDisabled ? 0.5 : 1,
           },
           targetPosition: Position.Left,
           sourcePosition: Position.Right,
@@ -150,6 +173,7 @@ export default function TalkFlowGraph() {
         data: {
           label: "最初の顧客発話を追加するとフローが生成されます",
           speaker: "System",
+          type: "system",
         },
         style: {
           width: nodeWidth,
@@ -167,18 +191,70 @@ export default function TalkFlowGraph() {
     }
 
     return { nodes: generatedNodes, edges: generatedEdges };
-  }, [conversation.blocks, scriptSuggestions]);
+  }, [conversation.blocks, scriptSuggestions, pendingSuggestionId]);
+
+  const handleInit = useCallback(() => {
+    isInitializedRef.current = true;
+    fitView({ padding: 0.22 });
+    zoomTo(preferredZoom, { duration: 0 });
+  }, [fitView, zoomTo]);
+
+  const handleNodeClick = useCallback(
+    async (_event: unknown, node: ConversationNode) => {
+      if (node.data?.type !== "suggestion" || !node.data.suggestion || pendingSuggestionId) {
+        return;
+      }
+
+      setPendingSuggestionId(node.id);
+      try {
+        await acceptSuggestion(node.data.suggestion);
+      } finally {
+        setPendingSuggestionId(null);
+      }
+    },
+    [acceptSuggestion, pendingSuggestionId]
+  );
+
+  useEffect(() => {
+    if (!isInitializedRef.current) {
+      return;
+    }
+
+    const previousCount = previousBlockCountRef.current;
+    const currentCount = conversation.blocks.length;
+    if (currentCount === 0) {
+      previousBlockCountRef.current = currentCount;
+      return;
+    }
+
+    if (currentCount > previousCount) {
+      const lastBlock = conversation.blocks[currentCount - 1];
+      const targetNode = nodes.find((node) => node.id === lastBlock.id);
+
+      if (targetNode) {
+        const centerX = targetNode.position.x + nodeWidth / 2;
+        const centerY = targetNode.position.y + nodeHeight / 2;
+        setCenter(centerX, centerY, { zoom: preferredZoom, duration: 400 });
+      }
+    }
+
+    previousBlockCountRef.current = currentCount;
+  }, [conversation.blocks, nodes, setCenter]);
 
   return (
     <div className="h-full">
       <ReactFlow
-        fitView
         nodes={nodes}
         edges={edges}
+        onInit={handleInit}
+        onNodeClick={handleNodeClick}
         panOnScroll
         panOnDrag
         zoomOnScroll
-        fitViewOptions={{ padding: 0.3 }}
+        minZoom={0.6}
+        maxZoom={1.6}
+        fitView
+        fitViewOptions={{ padding: 0.22 }}
         className="rounded-2xl"
       >
         <MiniMap className="!bg-white" zoomable pannable maskColor="rgba(0,0,0,0.05)" />
@@ -186,5 +262,13 @@ export default function TalkFlowGraph() {
         <Background color="rgba(0,0,0,0.08)" gap={32} />
       </ReactFlow>
     </div>
+  );
+}
+
+export default function TalkFlowGraph() {
+  return (
+    <ReactFlowProvider>
+      <TalkFlowGraphInner />
+    </ReactFlowProvider>
   );
 }
